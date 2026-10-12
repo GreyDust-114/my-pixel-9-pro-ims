@@ -64,3 +64,16 @@ dumpsys telephony.registry | grep -i "ImsRegistration"
 ## 许可
 
 Apache-2.0。carrier config 的取值思路来自 NKU100/carrier-ims。
+
+## 签名
+
+`.ci/keystore.b64` 是一份固定的 PKCS12 keystore（密码 `android`，别名 `pixel9proims`），
+由 [`openssl`](https://www.openssl.org/) 生成并提交在仓库里，CI 每次构建都用它签名。
+
+这样做是为了让每次构建的签名一致，否则 Android 会因为签名不同而拒绝覆盖安装。
+
+> ⚠️ 仓库是公开的，这份 keystore 也随之公开。对个人自用的侧载模块可以接受；
+> 若在意，可改为放进 GitHub Secrets（`KEYSTORE_B64`）并从 workflow 读取。
+
+首次从「每次重新生成 keystore」的旧构建升级时，需要先卸载旧版再装新版；
+之后就都能直接覆盖安装了。
